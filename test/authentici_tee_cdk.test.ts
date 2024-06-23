@@ -3,7 +3,7 @@
 // import * as AuthenticiTeeCdk from '../lib/authentici_tee_cdk-stack';
 
 // example test. To run these tests, uncomment this file along with the
-// example resource in lib/authentici_tee_cdk-stack.ts
+// example resource in lib/lambda.ts
 test('SQS Queue Created', () => {
 //   const app = new cdk.App();
 //     // WHEN

@@ -10,19 +10,19 @@ export const handler = async (event, context) => {
     };
 
     try {
-        let numberOfCodesToGenerate = 0;
+        let numberOfAuthCodesToGenerate = 0;
 
-        if (event.numberOfCodes) {
-            numberOfCodesToGenerate = event.numberOfCodes;
+        if (event.numberOfAuthCodes) {
+            numberOfAuthCodesToGenerate = event.numberOfAuthCodes;
         } else if (event.body !== null && event.body !== undefined) {
             const body = JSON.parse(event.body);
-            if (body.numberOfCodes) {
-                numberOfCodesToGenerate = body.numberOfCodes;
+            if (body.numberOfAuthCodes) {
+                numberOfAuthCodesToGenerate = body.numberOfAuthCodes;
             }
         }
-        console.log("Number of codes: " + numberOfCodesToGenerate);
+
         const generatedCodes = [];
-        for(var i = 0; i < numberOfCodesToGenerate; i++) {
+        for(var i = 0; i < numberOfAuthCodesToGenerate; i++) {
             generatedCodes.push(generateUniqueCode());
         }
 
@@ -41,8 +41,6 @@ export const handler = async (event, context) => {
                 })
             }
         });
-
-        console.log("DDB Params: " + JSON.stringify(ddbParams));
 
         await client.send(ddbParams);
     } catch(err) {

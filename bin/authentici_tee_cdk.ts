@@ -19,7 +19,7 @@ const lambdaStack = new LambdaStack(app, 'lambda-stack', {
     authCodesTable: dynamoStack.authCodesTable
 });
 
-const apigwStack = new ApiGWStack(app, 'apigw-stack', {
+new ApiGWStack(app, 'apigw-stack', {
     env: { account: AWS_ACCOUNT, region: AWS_REGION },
-    authCodeGeneratorLambda: lambdaStack.authCodeGeneratorLambda
+    lambdaMap: lambdaStack.lambdaMap
 });

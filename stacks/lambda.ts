@@ -4,6 +4,7 @@ import {LogGroup, RetentionDays} from "aws-cdk-lib/aws-logs";
 import {Effect, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import {Table} from "aws-cdk-lib/aws-dynamodb";
+import {API_ENDPOINTS, ApiEndpointDefinition} from "../config/api_config";
 
 export interface LambdaStackProps extends cdk.StackProps {
   authCodesTable: Table
@@ -11,10 +12,11 @@ export interface LambdaStackProps extends cdk.StackProps {
 
 export class LambdaStack extends cdk.Stack {
 
-  authCodeGeneratorLambda: lambda.Function;
+  lambdaMap: Map<string, lambda.Function>;
 
   constructor(scope: Construct, id: string, props: LambdaStackProps) {
     super(scope, id, props);
+    this.lambdaMap = new Map<string, lambda.Function>();
 
     const idPrefix = "us-east-2-lambda";
 
@@ -52,15 +54,19 @@ export class LambdaStack extends cdk.Stack {
     //   effect: Effect.ALLOW
     // });
 
-    this.authCodeGeneratorLambda = new lambda.Function(this, `${idPrefix}-auth-code-generator`, {
-      functionName: 'AuthCodeGeneratorLambdaV2',
-      runtime: lambda.Runtime.NODEJS_20_X,
-      code: lambda.Code.fromAsset('lambda'),
-      handler: 'authCodeGeneratorLambda.handler',
-      logGroup: logGroup,
-      role: iamRole
-    });
+    API_ENDPOINTS.forEach((endpoint: ApiEndpointDefinition) => {
+      const lambdaFunction = new lambda.Function(this, `${idPrefix}-${endpoint.path}-lambda`, {
+        functionName: endpoint.functionName,
+        runtime: lambda.Runtime.NODEJS_20_X,
+        code: lambda.Code.fromAsset('lambda'),
+        handler: `${endpoint.handler}.handler`,
+        logGroup: logGroup,
+        role: iamRole
+      });
 
+      this.lambdaMap.set(endpoint.operationName, lambdaFunction);
+
+    });
     // authCodeGeneratorLambda.addToRolePolicy(metricsPolicyStatement);
   }
 }
